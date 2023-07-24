@@ -1,19 +1,19 @@
 from src.call import requestVersion2
 
 # Config State
-property_id = '212599'
-client_id = "live1_212599_LBRQd0lhTFIkJH5GCpwPUOEg"
-redirect_uri = "https://81ee-31-4-128-46.eu.ngrok.io"
+property_id = '295501'
+client_id = "live1_295501_g6aBYH9oejmTdGLsbFO8uDtR"
+redirect_uri = "https://opencheck.es"
 
-client_secret = 'gwSvTrFauEbt4OkKy1sVGCnB3hpcjf7I'
+client_secret = '3Xki5vVmtIuCYHhGdTMJU4fjgF0ewbO2'
 
 scope = "write:guest read:guest write:reservation read:reservation"
-code_4_scope_guest_and_reservation = "AqsDRLwBwGwv7np3giiTO_-M0OTgFDW1Q2a0VnBogHc"
-state_4_scope_guest_and_reservation = "fb08f0d2ff44e959fcd83dc20e58a8c0d729cf6f63761f5281799"
+code_4_scope_guest_and_reservation = "8AubJP-rnMiMJ7YshudHlNfgd0kIoSuv7_EBH-3F1EQ"
+state_4_scope_guest_and_reservation = "2b25900784b1f315fd71f16d19992c7e02773e5864be50422e1a4"
 path_tokens = "data/tokens_guests_and_reservation.json"
 
-code_4_scope_payment_and_room = "Ve353z0bQdMp-EmNuyGMwwaQR14OKeDAiKvq21EZ4aw"
-state_4_scope_payment_and_room = "fb08f0d2ff44e959fcd83dc20e58a8c0d729cf6f63761f7e5a84c"
+code_4_scope_payment_and_room = "V7SAw3ev9pHKE2ha8kayeBBQcpxGPYRMNRXkTUK4YSA"
+state_4_scope_payment_and_room = "2b25900784b1f315fd71f16d19992c7e02773e5864be50729fdb3"
 path_tokens_payment_and_room = "data/tokens_payments_and_room.json"
 
 reservation_id = "0934955461346"

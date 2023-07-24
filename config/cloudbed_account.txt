@@ -1,0 +1,8 @@
+usr: nlozano@opencheck.es 
+pass: Kiosko!23
+
+
+
+Client ID: live1_295501_g6aBYH9oejmTdGLsbFO8uDtR
+
+secret ID: 3Xki5vVmtIuCYHhGdTMJU4fjgF0ewbO2
