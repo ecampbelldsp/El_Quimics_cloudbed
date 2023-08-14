@@ -264,8 +264,8 @@ def reservation_is_paid():
 
 @app.route('/getPaymentMethods')
 def getPaymentMethods():
-    reservation_id = request.args.get('propertyID', None)
-    return request_guest_and_reservation.getPaymentMethods(reservation_id)
+    propertyID = request.args.get('propertyID', None)
+    return request_guest_and_reservation.getPaymentMethods(propertyID)
 
 
 @app.route('/postPayment')

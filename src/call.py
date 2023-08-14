@@ -538,9 +538,9 @@ class requestVersion2:
             return response
         else:
             return {'success': 'false', 'message': response['message']}
-    def getPaymentMethods(self, reservation_id: str):
+    def getPaymentMethods(self, propertyID: str):
     # Guest
-        url = f"https://hotels.cloudbeds.com/api/v1.1/getGuest?reservationID={reservation_id}"
+        url = f"https://hotels.cloudbeds.com/api/v1.1/getPaymentMethods?propertyID={propertyID}"
         header = {'Authorization': 'Bearer ' + self.access_token}
 
         r = requests.request("GET", url, headers=header)
