@@ -638,7 +638,7 @@ class requestVersion2:
             return {'success': 'false', 'message': response['message']}
 
     # Rooms
-    def get_available_room_types(self, start_date, end_date, rooms: int = 1, adults: int = 1, children: int = 0):
+    def get_available_room_types(self, start_date, end_date, rooms: int = 1, adults: int = 1, childrens: int = 0):
         """
 
         :param start_date:
@@ -649,11 +649,18 @@ class requestVersion2:
         :return: List with the available rooms.
         """
 
-        def filter_rooms_available(response_data):
+        def filter_rooms_available(response_data, adults, childrens):
             filter_rooms, name_rooms = [], []
 
             request_info_room = {}
             for room in response_data['propertyRooms']:
+                #Adding filtering room by amount of adultds and children
+                if int(room["maxGuests"]) < adults + childrens:
+                    continue
+                elif int(room["adultsIncluded"]) < adults:
+                    continue
+                elif int(room["childrenIncluded"]) < childrens:
+                    continue
                 request_info_room['roomTypeID'] = room['roomTypeID']
                 request_info_room['roomTypeName'] = room['roomTypeName']
                 request_info_room['roomTypeNameShort'] = room['roomTypeNameShort']
@@ -676,7 +683,7 @@ class requestVersion2:
 
         header = {'Authorization': 'Bearer ' + self.access_token}
         url = 'https://hotels.cloudbeds.com/api/v1.1/getAvailableRoomTypes'
-        payload = f'?startDate={start_date}&endDate={end_date}&rooms={rooms}&adults={adults}&children={children}'
+        payload = f'?startDate={start_date}&endDate={end_date}&rooms={rooms}&adults={adults}&children={childrens}'
 
         r = requests.get(url + payload, headers=header)
         response = json.loads(r.text, parse_int=str)
@@ -685,7 +692,7 @@ class requestVersion2:
             return {'success': False, 'availableRooms': None, 'rooms': None, 'message': 'There is no rooms available.'}
 
         elif self.connection_is_success(r) and response['success'] and response['roomCount'] != 0:
-            rooms_available = filter_rooms_available(response['data'][0])
+            rooms_available = filter_rooms_available(response['data'][0], adults, childrens)
             return rooms_available
         elif not response['success']:
             return response

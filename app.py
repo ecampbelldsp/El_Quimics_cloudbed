@@ -231,10 +231,10 @@ def get_available_rooms():
     end_date = request.args.get('endDate', None)
 
     rooms = request.args.get('rooms', 1)
-    adults = request.args.get('adults', None)
-    children = request.args.get('children', None)
+    adults = int(request.args.get('adults', None))
+    childrens = int(request.args.get('childrens', None))
 
-    return request_payment_and_room.get_available_room_types(start_date, end_date, rooms, adults, children)
+    return request_payment_and_room.get_available_room_types(start_date, end_date, rooms, adults, childrens)
 
 
 @app.route('/postGuestDocument')
