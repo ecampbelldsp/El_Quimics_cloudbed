@@ -14,6 +14,8 @@ from flask_cors import CORS, cross_origin
 from hd.cam import take_picture
 from src.config import   DATA_CLIENT_PATH
 import os
+import subprocess
+import time
 app = Flask(__name__)
 
 # app.config['CORS_HEADERS'] = 'Content-Type'
@@ -270,6 +272,91 @@ def post_payment():
 
     return request_payment_and_room.post_payment(reservation_id, amount, payment_type, card_type)
 
+@app.route('/verifone')
+def verifone():
+
+    puerto = "COM4"
+    cash = str(int(float(request.args.get('cash', None)) * 100))
+    #cash = str(request.args.get('cash', None))
+
+    # Define the path to the C# executable
+    root = "hd/verifone/"
+    csharp_executable = "Verifone_C_Sharp.exe"
+    args = [puerto,cash] # El cash es en centimos
+    # subprocess.Popen( ["mono"],executable=f"{root}{csharp_executable} " + "10", cwd = root)
+
+    command = ["dotnet", "run"] + args
+
+    csharp_process = subprocess.Popen( command,executable=f"{root}{csharp_executable}", cwd = root,stdout=subprocess.PIPE) #, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    # csharp_process.wait()
+    time.sleep(1)
+    while(True):
+
+        out = csharp_process.stdout.readline().decode()
+        if "\n" in out:
+            #print(out)
+            out = out.replace("\n", "")
+        if "\r" in out:
+            #print(out)
+            out = out.replace("\r", "")
+
+
+        print(out)
+        #return jsonify({'success': False, 'message': 'Devolución de pago. El sistema no tiene cashBack.'})
+        if "20" == out.lower():  #_on_
+             print("Esperando inserción de tarjeta")
+        elif "30" == out.lower():
+            print("Error de lectura de tarjeta")
+        elif "40" == out.lower():
+            print("Tarjeta leída")
+        elif "50" == out.lower():
+            print("Esperando confirmación de compra por cliente")
+        elif "60" == out.lower():
+            print("Transacción aprobada")
+            csharp_process.terminate()
+            csharp_process.wait()
+            return jsonify({'success': "true", 'message': 'Successful payment.'})
+        elif "70" == out.lower():
+            print("Transcción rechazada")
+            csharp_process.terminate()
+            csharp_process.wait()
+            return jsonify({'success': "false", 'message': 'Payment rejected'})
+        elif "80" == out.lower():
+            print("Esperando retirada de tarjeta")
+            csharp_process.terminate()
+            csharp_process.wait()
+            return jsonify({'success': "true", 'message': 'Successful payment.'})
+        elif "90" == out.lower():
+            print("Operación cancelada")
+            csharp_process.terminate()
+            csharp_process.wait()
+            return jsonify({'success': "false", 'message': 'Payment cancelled'})
+
+        elif "-1" == out.lower():
+            print("Sales market down")
+            csharp_process.terminate()
+            csharp_process.wait()
+            return jsonify({'success': "false", 'message': 'Sales market down'})
+        elif "-2" == out.lower():
+            print("Timeout para la presentación de tarjeta")
+            csharp_process.terminate()
+            csharp_process.wait()
+            return jsonify({'success': "false", 'message': 'Timeout'})
+        elif "-3" == out.lower():
+            print("Volviendo a reposo luego de haber iniciado una venta. Cancelación de venta")
+            csharp_process.terminate()
+            csharp_process.wait()
+            return jsonify({'success': "false", 'message': 'Payment cancelled'})
+        elif "0" == out.lower():
+            print("Estado de venta desconocido")
+            csharp_process.terminate()
+            csharp_process.wait()
+            return jsonify({'success': "false", 'message': 'Unknown sales state'})
+        elif "ok" == out.lower():
+            print("Successful payment")
+            csharp_process.terminate()
+            csharp_process.wait()
+            return jsonify({'success': "true", 'message': 'Successful payment.'})
 
 @app.route("/cam")
 def picture():
