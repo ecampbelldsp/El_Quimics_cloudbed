@@ -1,5 +1,14 @@
 from src.call import requestVersion2
 
+import sys
+import os
+
+DATA_CLIENT_PATH = "C:/Opencheck/tmp/"
+
+if not os.path.exists(DATA_CLIENT_PATH):
+    os.mkdir(DATA_CLIENT_PATH)
+
+
 # Config State
 property_id = '295501'
 client_id = "live1_295501_g6aBYH9oejmTdGLsbFO8uDtR"

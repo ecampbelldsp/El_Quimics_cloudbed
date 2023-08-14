@@ -12,7 +12,8 @@ from flask import Flask, render_template, jsonify, request
 from src.config import request_guest_and_reservation, request_payment_and_room, property_id
 from flask_cors import CORS, cross_origin
 from hd.cam import take_picture
-
+from src.config import   DATA_CLIENT_PATH
+import os
 app = Flask(__name__)
 
 # app.config['CORS_HEADERS'] = 'Content-Type'
@@ -22,6 +23,9 @@ CORS(app)
 
 
 # CORS(app, resources=r'/api/*')
+
+if not os.path.exists(DATA_CLIENT_PATH):
+    os.mkdir(DATA_CLIENT_PATH)
 
 
 @app.route('/')
@@ -164,7 +168,7 @@ def put_reservation():
 def post_reservation():
     data = request.get_json()
     guest_info = data.get('guestInfo')
-    room = data.get('rooms')[0]
+    room = data.get('rooms')
 
     # Update some reservation's values.
     guest_country_iso2 = coco.convert(names=guest_info['guestCountry'], to='ISO2')
