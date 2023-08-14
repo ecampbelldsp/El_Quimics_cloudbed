@@ -538,8 +538,18 @@ class requestVersion2:
             return response
         else:
             return {'success': 'false', 'message': response['message']}
-
+    def getPaymentMethods(self, reservation_id: str):
     # Guest
+        url = f"https://hotels.cloudbeds.com/api/v1.1/getGuest?reservationID={reservation_id}"
+        header = {'Authorization': 'Bearer ' + self.access_token}
+
+        r = requests.request("GET", url, headers=header)
+        response = json.loads(r.text, parse_int=str)
+
+        if self.connection_is_success(r) and response['success']:
+            return response['data']
+        elif not response['success']:
+            return response
     def get_guest(self, reservation_id: str = '', guest_id: str = '') -> dict:
         """
         Returns information on a guest specified by the Reservation ID parameter or by Guest ID

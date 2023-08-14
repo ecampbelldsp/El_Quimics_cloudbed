@@ -262,6 +262,11 @@ def reservation_is_paid():
     reservation_id = request.args.get('reservationID', None)
     return request_guest_and_reservation.reservation_is_paid(reservation_id)
 
+@app.route('/getPaymentMethods')
+def getPaymentMethods():
+    reservation_id = request.args.get('propertyID', None)
+    return request_guest_and_reservation.getPaymentMethods(reservation_id)
+
 
 @app.route('/postPayment')
 def post_payment():
