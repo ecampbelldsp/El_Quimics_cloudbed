@@ -157,10 +157,8 @@ def get_reservation():
 
     if response_in_json["success"] == "true":
         response_in_json = post_processing_reservation(response_in_json['data'])
-        response_in_json["success"] = "True"
-    else:
-        response_in_json["success"] = "False"
-    return response_in_json
+
+    return jsonify(response_in_json)
 
 
 @app.route('/putReservation', methods=['PUT'])
