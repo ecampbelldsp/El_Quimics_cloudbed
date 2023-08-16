@@ -30,7 +30,6 @@ import time
 import dateparser
 from src.tesa import GuestsWebService
 from src.data import *
-from src.call import Request, filter_get_reservation_response_cloudbed_format
 
 import cv2
 from time import sleep
