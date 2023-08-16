@@ -759,3 +759,27 @@ class requestVersion2:
 
             if self.connection_is_success(r):
                 return response
+
+    def filter_get_reservation_response_cloudbed_format(redforst_response):
+
+        data_cloudbed_format_getReservation["reservationID"] = redforst_response["Reservations"][
+            "InternalReservationNumber"]
+        data_cloudbed_format_getReservation["adults"] = redforst_response["Reservations"]["NumberOfAdults"]
+        data_cloudbed_format_getReservation["children"] = redforst_response["Reservations"]["NumberOfChildren"]
+
+        data_cloudbed_format_getReservation["guestLastName"] = redforst_response["Reservations"]['Customer']['LastName']
+        data_cloudbed_format_getReservation["guestFirstName"] = redforst_response["Reservations"]['Customer'][
+            'FirstName']
+
+        data_cloudbed_format_getReservation["roomID"] = redforst_response["Reservations"]['Rooms'][0]['RoomNumber']
+        data_cloudbed_format_getReservation["roomTypeName"] = redforst_response["Reservations"]['Rooms'][0][
+            'ShortDescription']
+
+        data_cloudbed_format_getReservation["startDate"] = redforst_response["Reservations"]['Rooms'][0]['StartDate']
+        data_cloudbed_format_getReservation["endDate"] = redforst_response["Reservations"]['Rooms'][0]['EndDate']
+
+        data_cloudbed_format_getReservation["balance"] = redforst_response["Reservations"]['TotalBalanceIT']
+        data_cloudbed_format_getReservation["paid"] = redforst_response["Reservations"]['TotalPaidIT']
+        data_cloudbed_format_getReservation["total"] = redforst_response["Reservations"]['TotalAmountIT']
+
+        return {"data": data_cloudbed_format_getReservation, "success": True}
