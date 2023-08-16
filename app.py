@@ -365,6 +365,164 @@ def verifone():
             csharp_process.wait()
             return jsonify({'success': "true", 'message': 'Successful payment.'})
 
+
+# TESA API
+host = "192.168.0.164"#"192.168.1.90"
+operatorName = 'opencheck' #"OPEN"#'opencheck'
+operatorPassword = '123456'#"123456"#'opencheck!'
+agentId = "ac54a7b4ac713ae3bddf36ecf9094f"#'bacd6749e86ffb7c7d3bf0dfaad12a'
+
+# Hotel data
+roomsTable = {"102":"13","101":"12","213": "1", "214": "2", "215": "3", "216": "4", "217": "5", "218": "6", "219": "7", "220": "8",
+              "221": "9", "222": "10", "223": "11", "224": "12", "225": "13", "226": "14"}
+
+
+# Utils
+def format_date(date, now=True):
+    date_object = dateparser.parse(date)
+    if date_object.time() == datetime.min.time() and now:
+        now = datetime.now()
+        date_object = date_object.replace(hour=now.hour, minute=now.minute, second=now.second)
+    elif not now:
+        date_object = date_object.replace(hour=11, minute=00, second=00)
+    return date_object.strftime("%Y-%m-%dT%H:%M:%S")
+
+
+def check_response(response):
+    # Verifica si el resultado es exitoso (RESULT_OK)
+    if response.type == 'RESULT_OK':
+        result = {
+            'success': True,
+            'message': 'Check-in realizado correctamente'
+        }
+    elif response.type == 'RESULT_ERROR' and response.errorCode == '508':
+        result = {
+            'success': True,
+            'errorCode': response.errorCode,
+            'message': 'Check-in/out realizado correctamente'
+        }
+    # Verifica si el resultado es un error de habitación no ocupada (RESULT_ERROR_CHECKIN_ROOM_NOT_OCCUPIED)
+    elif response.type == 'RESULT_ERROR' and response.errorType == 'RESULT_ERROR_CHECKIN_ROOM_NOT_OCCUPIED':
+        result = {
+            'success': False,
+            'type': response.type,
+            'errorCode': response.errorCode,
+            'errorType': response.errorType
+        }
+    else:
+        result = {
+            'success': False,
+            'type': response.errorType,
+            'message': response.errorDetail
+        }
+    return result
+
+
+@app.route("/tesa/v1.0/checkIn", methods=["POST"])
+def checkin():
+    # Extrae los datos del JSON recibido
+    data = request.get_json()
+
+    roomName = data['roomName']
+    roomId = roomsTable[roomName]
+
+    checkIn = data['checkIn']
+    checkInFormatted = format_date(checkIn)
+
+    checkOut = data['checkOut']
+    checkOutFormatted = format_date(checkOut, now=False)
+
+    # Mueve tarjeta a RF
+    response = rq.get("http://localhost:3200/api-hardware/v1/cardDispenser/moveCardToRF")
+
+    if not response:
+        result = {'success': False, 'type': "CARD_DISPENSER_ERROR", 'message': "error moving card to RF"}
+        return result
+
+    # Crea un cliente SOAP con la URL del servidor TESA
+    service = GuestsWebService(host, operatorName, operatorPassword)
+
+    # Realiza la operación de check-in utilizando el cliente SOAP
+    GuestInfoType = service.client.get_type('ns0:guestInfo')
+    guest_info = GuestInfoType(roomId=roomId, openowCheckin=True, localCardCheckin=True, agentId=agentId,
+                               dateActivation=checkInFormatted,
+                               dateExpiration=checkOutFormatted)
+    response = service.check_in(guest_info)
+    result = check_response(response)
+
+    # Entrega tarjeta
+    response = rq.get("http://localhost:3200/api-hardware/v1/cardDispenser/moveCardToFrontAndHold")
+    if not response:
+        result = {'success': False, 'type': "CARD_DISPENSER_ERROR", 'message': "error moving card to front"}
+        return result
+
+    return jsonify(result)
+
+
+@app.route('/tesa/v1.0/checkInCopy', methods=['POST'])
+def checkinCopy():
+    # Extrae los datos del JSON recibido
+    data = request.get_json()
+
+    roomName = data['roomName']
+    roomId = roomsTable[roomName]
+
+    checkIn = data['checkIn']
+    checkInFormatted = format_date(checkIn)
+
+    checkOut = data['checkOut']
+    checkOutFormatted = format_date(checkOut, now=False)
+
+    # Mueve tarjeta a RF
+    response = rq.get("http://localhost:3200/api-hardware/v1/cardDispenser/moveCardToRF")
+    if not response:
+        result = {'success': False, 'type': "CARD_DISPENSER_ERROR", 'message': "error moving card to RF"}
+        return result
+
+    # Crea un cliente SOAP con la URL del servidor TESA
+    service = GuestsWebService(host, operatorName, operatorPassword)
+
+    # Realiza la operación de check-in utilizando el cliente SOAP
+    GuestInfoType = service.client.get_type('ns0:guestInfo')
+    guest_info = GuestInfoType(roomId=roomId, openowCheckin=True, localCardCheckin=True, agentId=agentId,
+                               dateActivation=checkInFormatted,
+                               dateExpiration=checkOutFormatted)
+
+    response = service.check_in_copy(guest_info)
+    result = check_response(response)
+
+    # Entrega tarjeta
+    response = rq.get("http://localhost:3200/api-hardware/v1/cardDispenser/moveCardToFrontAndHold")
+    if not response:
+        result = {'success': False, 'type': "CARD_DISPENSER_ERROR", 'message': "error moving card to front"}
+        return result
+
+    return jsonify(result)
+
+
+@app.route('/tesa/v1.0/checkOut', methods=['POST'])
+def checkout():
+    # Extrae los datos del JSON recibido
+    data = request.get_json()
+
+    # Crea un cliente SOAP con la URL del servidor TESA
+    client = GuestsWebService(host, operatorName, operatorPassword)
+
+    # Construye el objeto `guestData`
+    roomNumber = data['roomName']
+    roomId = roomsTable[roomNumber]
+
+    # Realiza la operación de check-out utilizando el cliente SOAP
+    response = client.check_out(roomId)
+    result = check_response(response)
+
+    # Mueve tarjeta a RF
+    response = rq.get("http://localhost:3200/api-hardware/v1/cardDispenser/moveCardToRF")
+    if not response:
+        result = {'success': False, 'type': "CARD_DISPENSER_ERROR", 'message': "error moving card to RF"}
+        return result
+    return jsonify(result)
+
 @app.route("/cam")
 def picture():
     flag = take_picture()
