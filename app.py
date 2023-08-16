@@ -17,6 +17,16 @@ from src.config import   DATA_CLIENT_PATH
 import os
 import subprocess
 import time
+
+import dateparser
+from src.tesa import GuestsWebService
+
+import cv2
+from time import sleep
+from datetime import datetime
+
+import base64
+
 app = Flask(__name__)
 
 # app.config['CORS_HEADERS'] = 'Content-Type'
@@ -529,6 +539,103 @@ def picture():
     flag = take_picture()
     return flag
 
+
+@app.route('/guardar-imagen', methods=['POST'])
+def guardar_imagen():
+    imagen_base64 = request.form['imagen']
+    # Decodificar la imagen base64 en una matriz de bytes
+    imagen_bytes = base64.b64decode(imagen_base64.split(',')[1])
+
+    # Definir la ruta y el nombre de archivo para guardar la imagen
+    date_str = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
+    reservationID = request.form['reservationID']
+    guest_i = request.form['guest_i']
+    name = f"{reservationID}_{guest_i}_{date_str}"
+    print(name)
+    ruta_guardado = os.path.join(DATA_CLIENT_PATH, name + '.png')
+
+    # Guardar la imagen en el servidor
+    with open(ruta_guardado, 'wb') as archivo:
+        archivo.write(imagen_bytes)
+
+    sleep(1)
+    return "Imagen: " + name + " recibida y guardada exitosamente"
+
+
+@app.route('/picture')
+def webcam():
+    cam = cv2.VideoCapture(0)
+
+    date_str = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
+    reservationID = request.args.get('reservationID', None)
+    guest_i = request.args.get('guest_i', None)
+    name = f"{reservationID}_{guest_i}_{date_str}"
+    sleep(1)
+
+    ret, image = cam.read()
+    cv2.imwrite(f"{DATA_CLIENT_PATH}{name}.png", image)
+    print("{DATA_CLIENT_PATH}/{name}.png")
+
+    cam.release()
+    cv2.destroyAllWindows()
+
+    return json.dumps({'success': ret})
+
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+# Manejador de evento para la conexión del cliente
+@socketio.on('connect')
+def handle_connect():
+    # Iniciar el proceso de captura de video en un hilo separado
+    video_thread = VideoThread()
+    video_thread.start()
+
+# Clase para el hilo de captura de video
+class VideoThread(threading.Thread):
+    def run(self):
+        # Iniciar la captura de video desde la cámara web
+        capture = cv2.VideoCapture(0)
+
+        while True:
+            ret, frame = capture.read()
+            if not ret:
+                break
+
+            # Codificar el frame en formato JPEG
+            ret, jpeg = cv2.imencode('.jpg', frame)
+
+            # Enviar el frame codificado al navegador a través de Socket.IO
+            socketio.emit('video_stream', jpeg.tobytes())
+
+        # Liberar los recursos de la cámara y detener la captura
+        capture.release()
+
+@app.route('/sendEmail')
+def call_send_gmail_function(TO = "", att = None ):
+
+    reservationID = request.args.get('reservationID', None)
+    if reservationID is None or len(reservationID) ==0:
+        return json.dumps({"data": "","success": False})
+
+    with zipfile.ZipFile(f"{DATA_CLIENT_PATH}{reservationID}.zip", "w") as zf:
+        tmp = f"{DATA_CLIENT_PATH}"
+        for file_name in os.listdir(tmp):
+            if file_name[-4:] == ".pdf" or file_name[-4:] == ".png":
+                zf.write(tmp+file_name, basename(tmp+file_name))
+    attachment = f"{DATA_CLIENT_PATH}{reservationID}.zip"
+
+    send_message_status = gmail_send_message(FROM = 'opencheckdev@gmail.com', TO ="ecampbelldsp@gmail.com", attachment_filename = attachment, subject = f"Clients info - Hotel Artxanta - Reservation ID {reservationID}")
+    if not os.path.exists("C:/Clients/"):
+        os.mkdir("C:/Clients/")
+    shutil.copy(attachment, f"C:/Clients/{attachment.split('/')[-1]}")
+
+    # time.sleep(3)
+    if send_message_status.get('labelIds')[0] == 'SENT':
+        for file_name in os.listdir(tmp):
+            os.remove(f"{tmp}{file_name}")
+
+
+    return send_message_status
 
 if __name__ == '__main__':
     # Flask app
