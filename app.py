@@ -155,8 +155,10 @@ def get_reservation():
     reservation_id = request.args.get('reservationID', None)
     response_in_json = request_guest_and_reservation.get_reservation(reservation_id)
 
-    open_check_reservation = post_processing_reservation(response_in_json['data'])
-    return open_check_reservation
+    if response_in_json["success"] == "true":
+        response_in_json = post_processing_reservation(response_in_json['data'])
+
+    return response_in_json
 
 
 @app.route('/putReservation', methods=['PUT'])
