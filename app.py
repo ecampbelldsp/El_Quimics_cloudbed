@@ -7,23 +7,35 @@ Created on  19/8/22 14:17
 contact: ecampbelldsp@gmail.com & ramirezsanchezjosem@gmail.com
 """
 
+import threading
+
+
 import country_converter as coco
 import dateparser
 from flask import Flask, render_template, jsonify, request
+from flask_socketio import SocketIO, emit
+
 from src.config import request_guest_and_reservation, request_payment_and_room, property_id
 from flask_cors import CORS, cross_origin
 from hd.cam import take_picture
-from src.config import   DATA_CLIENT_PATH
+from src.config import   DATA_CLIENT_PATH, accommodation_id
+import zipfile
+from os.path import basename
+import shutil
+import requests as rq
 import os
 import subprocess
 import time
 
 import dateparser
 from src.tesa import GuestsWebService
+from src.data import *
+from src.call import Request, filter_get_reservation_response_cloudbed_format
 
 import cv2
 from time import sleep
 from datetime import datetime
+
 
 import base64
 
