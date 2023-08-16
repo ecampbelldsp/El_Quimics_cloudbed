@@ -8,6 +8,8 @@ DATA_CLIENT_PATH = "C:/Opencheck/tmp/"
 if not os.path.exists(DATA_CLIENT_PATH):
     os.mkdir(DATA_CLIENT_PATH)
 
+accommodation_id = {"1": "Individual 1 Cama", "2":"Doble 2 Camas", "19":"Doble 1 Cama Matrimonio", "20": "Triple 3 Camas", "21":"Familiar 4 Camas"}
+
 
 # Config State
 property_id = '295501'
