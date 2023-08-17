@@ -35,6 +35,7 @@ import cv2
 from time import sleep
 from datetime import datetime
 
+from email_server.send import gmail_send_message
 
 import base64
 
