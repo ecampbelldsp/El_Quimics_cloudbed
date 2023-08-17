@@ -36,6 +36,7 @@ from time import sleep
 from datetime import datetime
 
 from email_server.send import gmail_send_message
+import qrcode
 
 import base64
 
@@ -648,6 +649,18 @@ def call_send_gmail_function(TO = "", att = None ):
 
 
     return send_message_status
+
+@app.route("/qr")
+def create_qr():
+    try:
+        reservationID = request.args.get('reservationID', None)
+        qr_img = qrcode.make(reservationID)
+        qr_img.save(f"{DATA_CLIENT_PATH}QR_localizador_{reservationID}.jpg")
+
+        return {'success': 'true', 'message': "OK"}
+    except:
+
+        return {'success': 'false', 'message': ""}
 
 if __name__ == '__main__':
     # Flask app
