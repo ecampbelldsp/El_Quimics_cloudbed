@@ -664,8 +664,10 @@ class requestVersion2:
             filter_rooms, name_rooms = [], []
 
             request_info_room = {}
-            for room in response_data['propertyRooms']:
-                #Adding filtering room by amount of adultds and children
+            for i,room in enumerate(response_data['propertyRooms']):
+                #Avoiding duplicated rooms type. Picking the room with the highest price
+                if i != 0 and room['roomTypeName'] == name_rooms[-1]:
+                    continue                #Adding filtering room by amount of adultds and children
                 if int(room["maxGuests"]) < adults + childrens:
                     continue
                 elif int(room["adultsIncluded"]) < adults:
