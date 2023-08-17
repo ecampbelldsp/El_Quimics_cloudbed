@@ -535,6 +535,7 @@ class requestVersion2:
         response = json.loads(r.text, parse_int=str)
 
         if self.connection_is_success(r):
+            response["success"] = str(response["success"]).lower()
             return response
         else:
             return {'success': 'false', 'message': response['message']}
