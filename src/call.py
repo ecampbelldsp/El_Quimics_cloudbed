@@ -535,6 +535,7 @@ class requestVersion2:
         response = json.loads(r.text, parse_int=str)
 
         if self.connection_is_success(r):
+            response["success"] = str(response["success"]).lower()
             return response
         else:
             return {'success': 'false', 'message': response['message']}
@@ -664,7 +665,9 @@ class requestVersion2:
 
             request_info_room = {}
             for i,room in enumerate(response_data['propertyRooms']):
-                #Adding filtering room by amount of adultds and children
+                #Avoiding duplicated rooms type. Picking the room with the highest price
+                if i != 0 and room['roomTypeName'] == name_rooms[-1]:
+                    continue                #Adding filtering room by amount of adultds and children
                 if int(room["maxGuests"]) < adults + childrens:
                     continue
                 elif int(room["adultsIncluded"]) < adults:
@@ -683,7 +686,6 @@ class requestVersion2:
                 request_info_room['roomRate'] = room['roomRate']
                 request_info_room['roomsAvailable'] = room['roomsAvailable']
                 request_info_room['childrenExtraCharge'] = room.get('childrenExtraCharge', 0)
-
                 name_rooms.append(room['roomTypeName'])
                 filter_rooms.append(request_info_room.copy())
 
