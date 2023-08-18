@@ -633,12 +633,12 @@ def call_send_gmail_function(TO = "", att = None ):
     with zipfile.ZipFile(f"{DATA_CLIENT_PATH}{reservationID}.zip", "w") as zf:
         tmp = f"{DATA_CLIENT_PATH}"
         for file_name in os.listdir(tmp):
-            if file_name[-4:] == ".pdf" or file_name[-4:] == ".png":
+            if file_name[-4:] == ".pdf" or file_name[-4:] == ".png" or file_name[-4:] == ".jpg":
                 zf.write(tmp+file_name, basename(tmp+file_name))
     attachment = f"{DATA_CLIENT_PATH}{reservationID}.zip"
 
     message = "Thank you for booking with us. Find attached your reservation information."
-    send_message_status = gmail_send_message(message_text = message, FROM = 'opencheckdev@gmail.com', TO ="ecampbelldsp@gmail.com", attachment_filename = attachment, subject = f"Clients info - APARTAMENTOS ELS QUIMICS (Girona)  - Reservation ID {reservationID}")
+    send_message_status = gmail_send_message(message_text = message, FROM = 'apartamentoselsquimics@gmail.com', TO ="ecampbelldsp@gmail.com", attachment_filename = attachment, subject = f"Clients info - APARTAMENTOS ELS QUIMICS (Girona)  - Reservation ID {reservationID}")
     if not os.path.exists("C:/Clients/"):
         os.mkdir("C:/Clients/")
     shutil.copy(attachment, f"C:/Clients/{attachment.split('/')[-1]}")
