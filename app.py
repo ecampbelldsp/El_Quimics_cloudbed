@@ -6,7 +6,7 @@ Created on  19/8/22 14:17
 @author: Edward L. Campbell Hernández & José M. Ramírez
 contact: ecampbelldsp@gmail.com & ramirezsanchezjosem@gmail.com
 """
-
+import json
 import threading
 
 
@@ -624,11 +624,18 @@ class VideoThread(threading.Thread):
         capture.release()
 
 @app.route('/sendEmail')
-def call_send_gmail_function(TO = "", att = None ):
+def call_send_gmail_function(TO="", att=None):
 
     reservationID = request.args.get('reservationID', None)
-    if reservationID is None or len(reservationID) ==0:
-        return json.dumps({"data": "","success": False})
+    if reservationID is None or len(reservationID) == 0:
+        return json.dumps({"data": "", "success": False})
+
+    response_in_json = request_guest_and_reservation.get_reservation(reservationID)
+    if response_in_json["success"] == "true":
+        reservation_json = response_in_json['data']
+        guest_email = reservation_json.get("guestEmail")
+    else:
+        return json.dumps({"data": "", "success": False})
 
     with zipfile.ZipFile(f"{DATA_CLIENT_PATH}{reservationID}.zip", "w") as zf:
         tmp = f"{DATA_CLIENT_PATH}"
@@ -638,7 +645,17 @@ def call_send_gmail_function(TO = "", att = None ):
     attachment = f"{DATA_CLIENT_PATH}{reservationID}.zip"
 
     message = "Thank you for booking with us. Find attached your reservation information."
-    send_message_status = gmail_send_message(message_text = message, FROM = 'apartamentoselsquimics@gmail.com', TO ="ecampbelldsp@gmail.com", attachment_filename = attachment, subject = f"Clients info - APARTAMENTOS ELS QUIMICS (Girona)  - Reservation ID {reservationID}")
+    send_message_status = gmail_send_message(message_text=message,
+                                             FROM='apartamentoselsquimics@gmail.com',
+                                             TO=f"{guest_email}",
+                                             attachment_filename=attachment,
+                                             subject=f"Clients info - APARTAMENTOS ELS QUIMICS (Girona)  - Reservation ID {reservationID}")
+
+    send_message_status = gmail_send_message(message_text=message,
+                                             FROM='apartamentoselsquimics@gmail.com',
+                                             TO=f"info@quimics.com",
+                                             attachment_filename=attachment,
+                                             subject=f"Clients info - APARTAMENTOS ELS QUIMICS (Girona)  - Reservation ID {reservationID}")
     if not os.path.exists("C:/Clients/"):
         os.mkdir("C:/Clients/")
     shutil.copy(attachment, f"C:/Clients/{attachment.split('/')[-1]}")
