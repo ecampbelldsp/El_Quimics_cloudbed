@@ -9,7 +9,6 @@ contact: ecampbelldsp@gmail.com & ramirezsanchezjosem@gmail.com
 import json
 import threading
 
-
 import country_converter as coco
 import dateparser
 from flask import Flask, render_template, jsonify, request
@@ -18,7 +17,7 @@ from flask_socketio import SocketIO, emit
 from src.config import request_guest_and_reservation, request_payment_and_room, property_id
 from flask_cors import CORS, cross_origin
 from hd.cam import take_picture
-from src.config import   DATA_CLIENT_PATH, accommodation_id
+from src.config import DATA_CLIENT_PATH, accommodation_id
 import zipfile
 from os.path import basename
 import shutil
@@ -46,7 +45,6 @@ app = Flask(__name__)
 
 # CORS(app)
 CORS(app)
-
 
 # CORS(app, resources=r'/api/*')
 
@@ -89,6 +87,7 @@ def get_reservation():
             "guestDocumentExpirationDate": "",
             "roomTypeID": [],
             "roomTypeName": [],
+            "roomName": [],
             "roomID": [],
             "startDate": [],
             "endDate": [],
@@ -127,20 +126,18 @@ def get_reservation():
 
         # Room reservation info
         for room in json['unassigned']:
-            # reservation_out['roomID'].append(room.get('roomID'))
             reservation_out['roomID'].append(room.get('roomTypeID'))
+            reservation_out['roomName'].append(room.get('roomName'))
             reservation_out['roomTypeName'].append(room.get('roomTypeName'))
-            # reservation_out['roomID'].append(room.get('roomID'))
             reservation_out['startDate'].append(room.get('dailyRates')[0]['date'])  # room.get('startDate')
             reservation_out['endDate'].append(room.get('dailyRates')[-1]['date'])
             reservation_out['adults'].append(room.get('adults'))
             reservation_out['children'].append(room.get('children'))
 
         for room in json['assigned']:
-            # reservation_out['roomID'].append(room.get('roomID'))
             reservation_out['roomID'].append(room.get('roomTypeID'))
+            reservation_out['roomName'].append(room.get('roomName'))
             reservation_out['roomTypeName'].append(room.get('roomTypeName'))
-            # reservation_out['roomID'].append(room.get('roomID'))
             reservation_out['startDate'].append(room.get('dailyRates')[0]['date'])
             reservation_out['endDate'].append(room.get('dailyRates')[-1]['date'])
             reservation_out['adults'].append(room.get('adults'))
@@ -182,7 +179,7 @@ def get_reservation():
     if response_in_json["success"] == "true":
         response_in_json = post_processing_reservation(response_in_json['data'])
 
-    return response_in_json# jsonify(response_in_json)
+    return response_in_json
 
 
 @app.route('/putReservation', methods=['PUT'])
@@ -225,6 +222,7 @@ def get_reservation_invoice_information():
     Get reservation invoice information.
     :return: a json with a reservation invoice information filtered.
     """
+
     def post_processing_reservation_invoice_information(json):
         """
         Post-processing stage for Frontend.
@@ -288,6 +286,7 @@ def reservation_is_paid():
     reservation_id = request.args.get('reservationID', None)
     return request_guest_and_reservation.reservation_is_paid(reservation_id)
 
+
 @app.route('/getPaymentMethods')
 def getPaymentMethods():
     propertyID = request.args.get('propertyID', None)
@@ -303,39 +302,39 @@ def post_payment():
 
     return request_payment_and_room.post_payment(reservation_id, amount, payment_type, card_type)
 
+
 @app.route('/verifone')
 def verifone():
-
     puerto = "COM4"
     cash = str(int(float(request.args.get('cash', None)) * 100))
-    #cash = str(request.args.get('cash', None))
+    # cash = str(request.args.get('cash', None))
 
     # Define the path to the C# executable
     root = "hd/verifone/"
     csharp_executable = "Verifone_C_Sharp.exe"
-    args = [puerto,cash] # El cash es en centimos
+    args = [puerto, cash]  # El cash es en centimos
     # subprocess.Popen( ["mono"],executable=f"{root}{csharp_executable} " + "10", cwd = root)
 
     command = ["dotnet", "run"] + args
 
-    csharp_process = subprocess.Popen( command,executable=f"{root}{csharp_executable}", cwd = root,stdout=subprocess.PIPE) #, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    csharp_process = subprocess.Popen(command, executable=f"{root}{csharp_executable}", cwd=root,
+                                      stdout=subprocess.PIPE)  # , stdout=subprocess.PIPE, stderr=subprocess.PIPE
     # csharp_process.wait()
     time.sleep(1)
-    while(True):
+    while (True):
 
         out = csharp_process.stdout.readline().decode()
         if "\n" in out:
-            #print(out)
+            # print(out)
             out = out.replace("\n", "")
         if "\r" in out:
-            #print(out)
+            # print(out)
             out = out.replace("\r", "")
 
-
         print(out)
-        #return jsonify({'success': False, 'message': 'Devolución de pago. El sistema no tiene cashBack.'})
-        if "20" == out.lower():  #_on_
-             print("Esperando inserción de tarjeta")
+        # return jsonify({'success': False, 'message': 'Devolución de pago. El sistema no tiene cashBack.'})
+        if "20" == out.lower():  # _on_
+            print("Esperando inserción de tarjeta")
         elif "30" == out.lower():
             print("Error de lectura de tarjeta")
         elif "40" == out.lower():
@@ -391,14 +390,19 @@ def verifone():
 
 
 # TESA API
-host = "192.168.0.164"#"192.168.1.90"
-operatorName = 'opencheck' #"OPEN"#'opencheck'
-operatorPassword = '123456'#"123456"#'opencheck!'
-agentId = "ac54a7b4ac713ae3bddf36ecf9094f"#'bacd6749e86ffb7c7d3bf0dfaad12a'
+host = "192.168.1.10"
+operatorName = "direc"
+operatorPassword = "clave1"
+agentId = "c4097353db0354d419ca229064c98b" # Kiosko AgentID
 
 # Hotel data
-roomsTable = {"102":"13","101":"12","213": "1", "214": "2", "215": "3", "216": "4", "217": "5", "218": "6", "219": "7", "220": "8",
-              "221": "9", "222": "10", "223": "11", "224": "12", "225": "13", "226": "14"}
+roomsTable = {"101": "3", "102": "4", "103": "5", "104": "6", "105": "7", "106": "8",
+              "201": "9", "202": "10", "203": "11", "204": "12", "205": "13", "206": "14",
+              "301": "15", "302": "16", "303": "17", "304": "18", "305": "19", "306": "20",
+              "401": "21", "402": "22", "403": "23", "404": "24", "405": "25", "406": "26",
+              "501": "27", "502": "28", "503": "29", "504": "30", "505": "31", "506": "32",
+              "601": "33", "602": "34", "603": "35", "604": "36", "605": "37", "606": "38",
+              "607": "59", "608": "60", "609": "61"}
 
 
 # Utils
@@ -440,6 +444,18 @@ def check_response(response):
             'message': response.errorDetail
         }
     return result
+
+
+# TESA
+@app.route("/tesa/findAllRooms")
+def find_all_rooms():
+    # Crea un cliente SOAP con la URL del servidor TESA
+    try:
+        service = GuestsWebService(host, operatorName, operatorPassword)
+        response = service.find_all_rooms()
+        return {"success": True}
+    except:
+        return {"success": False}
 
 
 @app.route("/tesa/v1.0/checkIn", methods=["POST"])
@@ -547,6 +563,8 @@ def checkout():
         return result
     return jsonify(result)
 
+
+# Video and Camera
 @app.route("/cam")
 def picture():
     flag = take_picture()
@@ -594,7 +612,9 @@ def webcam():
 
     return json.dumps({'success': ret})
 
+
 socketio = SocketIO(app, cors_allowed_origins="*")
+
 
 # Manejador de evento para la conexión del cliente
 @socketio.on('connect')
@@ -602,6 +622,7 @@ def handle_connect():
     # Iniciar el proceso de captura de video en un hilo separado
     video_thread = VideoThread()
     video_thread.start()
+
 
 # Clase para el hilo de captura de video
 class VideoThread(threading.Thread):
@@ -623,9 +644,9 @@ class VideoThread(threading.Thread):
         # Liberar los recursos de la cámara y detener la captura
         capture.release()
 
+
 @app.route('/sendEmail')
 def call_send_gmail_function(TO="", att=None):
-
     reservationID = request.args.get('reservationID', None)
     if reservationID is None or len(reservationID) == 0:
         return json.dumps({"data": "", "success": False})
@@ -641,7 +662,7 @@ def call_send_gmail_function(TO="", att=None):
         tmp = f"{DATA_CLIENT_PATH}"
         for file_name in os.listdir(tmp):
             if file_name[-4:] == ".pdf" or file_name[-4:] == ".png" or file_name[-4:] == ".jpg":
-                zf.write(tmp+file_name, basename(tmp+file_name))
+                zf.write(tmp + file_name, basename(tmp + file_name))
     attachment = f"{DATA_CLIENT_PATH}{reservationID}.zip"
 
     message = "Thank you for booking with us. Find attached your reservation information."
@@ -665,8 +686,8 @@ def call_send_gmail_function(TO="", att=None):
         for file_name in os.listdir(tmp):
             os.remove(f"{tmp}{file_name}")
 
-
     return send_message_status
+
 
 @app.route("/qr")
 def create_qr():
@@ -679,6 +700,7 @@ def create_qr():
     except:
 
         return {'success': 'false', 'message': ""}
+
 
 if __name__ == '__main__':
     # Flask app

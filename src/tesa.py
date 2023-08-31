@@ -16,7 +16,6 @@ class BaseSOAPClient:
 class GuestsWebService(BaseSOAPClient):
     def __init__(self, host, operator_name, operator_password):
         self.descriptor = f"https://{host}:8181/TesaHotelPlatform/GuestsWebService?wsdl"
-        #self.descriptor = "https://localhost:8181/ServerPlatform/modern/es/#/"
         self.operator_name = operator_name
         self.operator_password = operator_password
         super().__init__(self.descriptor)
@@ -37,4 +36,9 @@ class GuestsWebService(BaseSOAPClient):
         response = self.client.service.checkout(operatorName=self.operator_name,
                                                 operatorPassword=self.operator_password,
                                                 roomId=room_id)
+        return response
+
+    def find_all_rooms(self):
+        response = self.client.service.findAllRooms(operatorName=self.operator_name,
+                                                    operatorPassword=self.operator_password)
         return response
