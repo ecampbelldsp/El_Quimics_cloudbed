@@ -6,38 +6,32 @@ Created on  19/8/22 14:17
 @author: Edward L. Campbell Hernández & José M. Ramírez
 contact: ecampbelldsp@gmail.com & ramirezsanchezjosem@gmail.com
 """
+import base64
 import json
+import os
+import shutil
+import subprocess
 import threading
+import time
+import zipfile
+from datetime import datetime
+from os.path import basename
+from time import sleep
 
 import country_converter as coco
-import dateparser
-from flask import Flask, render_template, jsonify, request
-from flask_socketio import SocketIO, emit
-
-from src.config import request_guest_and_reservation, request_payment_and_room, property_id
-from flask_cors import CORS, cross_origin
-from hd.cam import take_picture
-from src.config import DATA_CLIENT_PATH, accommodation_id
-import zipfile
-from os.path import basename
-import shutil
-import requests as rq
-import os
-import subprocess
-import time
-
-import dateparser
-from src.tesa import GuestsWebService
-from src.data import *
-
 import cv2
-from time import sleep
-from datetime import datetime
+import dateparser
+import qrcode
+import requests as rq
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+from flask_socketio import SocketIO
 
 from email_server.send import gmail_send_message
-import qrcode
-
-import base64
+from hd.cam import take_picture
+from src.config import DATA_CLIENT_PATH
+from src.config import request_guest_and_reservation, request_payment_and_room, property_id
+from src.tesa import GuestsWebService
 
 app = Flask(__name__)
 
@@ -54,7 +48,7 @@ if not os.path.exists(DATA_CLIENT_PATH):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return {"success": True, "message": "WELCOME! Backend-Kiosko-Cloudbeds"}
 
 
 @app.route('/ping')
@@ -64,12 +58,12 @@ def ping():
 
 @app.route('/getReservation')
 def get_reservation():
-    def post_processing_reservation(json: dict):
+    def post_processing_reservation(reservation_json: dict):
 
         reservation_out = {
-            "reservationID": json.get("reservationID"),
-            "guestName": json.get("guestName"),
-            "guestEmail": json.get("guestEmail"),
+            "reservationID": reservation_json.get("reservationID"),
+            "guestName": reservation_json.get("guestName"),
+            "guestEmail": reservation_json.get("guestEmail"),
             "guestID": "",
             "guestFirstName": "",
             "guestLastName": "",
@@ -99,7 +93,7 @@ def get_reservation():
         }
 
         # Guests reservation info
-        guests_info = json['guestList']
+        guests_info = reservation_json['guestList']
         for guest_id in guests_info.keys():
             guest_data = guests_info[guest_id]
 
@@ -125,7 +119,7 @@ def get_reservation():
                 reservation_out['guestDocumentIssuingCountry'] = guest_data['guestDocumentIssuingCountry']
 
         # Room reservation info
-        for room in json['unassigned']:
+        for room in reservation_json['unassigned']:
             reservation_out['roomID'].append(room.get('roomTypeID'))
             reservation_out['roomName'].append(room.get('roomName'))
             reservation_out['roomTypeName'].append(room.get('roomTypeName'))
@@ -134,7 +128,7 @@ def get_reservation():
             reservation_out['adults'].append(room.get('adults'))
             reservation_out['children'].append(room.get('children'))
 
-        for room in json['assigned']:
+        for room in reservation_json['assigned']:
             reservation_out['roomID'].append(room.get('roomTypeID'))
             reservation_out['roomName'].append(room.get('roomName'))
             reservation_out['roomTypeName'].append(room.get('roomTypeName'))
@@ -161,8 +155,8 @@ def get_reservation():
             reservation_out[key] = data
 
         # Invoice reservation info
-        total = json['balanceDetailed']['grandTotal']
-        paid = json['balanceDetailed']['paid']
+        total = reservation_json['balanceDetailed']['grandTotal']
+        paid = reservation_json['balanceDetailed']['paid']
         balance = float(total) - float(paid)
 
         reservation_out["paid"] = paid
@@ -223,14 +217,14 @@ def get_reservation_invoice_information():
     :return: a json with a reservation invoice information filtered.
     """
 
-    def post_processing_reservation_invoice_information(json):
+    def post_processing_reservation_invoice_information(invoice_json):
         """
         Post-processing stage for Frontend.
-        :param json: a reservation's invoice information in json format.
+        :param invoice_json: a reservation's invoice information in json format.
         :return: a filtered invoice information (balance, paid, grandTotal, etc) in json format.
         """
-        reservation_out = {'success': 'true', 'paid': json['paid'], 'total': json['grandTotal'],
-                           'balance': str(float(json['grandTotal']) - float(json['paid']))}
+        reservation_out = {'success': 'true', 'paid': invoice_json['paid'], 'total': invoice_json['grandTotal'],
+                           'balance': str(float(invoice_json['grandTotal']) - float(invoice_json['paid']))}
 
         reservation_out['paidStatus'] = 'false' if float(reservation_out['balance']) > 0 else 'true'
         return reservation_out
@@ -288,9 +282,9 @@ def reservation_is_paid():
 
 
 @app.route('/getPaymentMethods')
-def getPaymentMethods():
-    propertyID = request.args.get('propertyID', None)
-    return request_payment_and_room.getPaymentMethods(propertyID)
+def get_payment_methods():
+    property_id_ = request.args.get('propertyID', None)
+    return request_payment_and_room.getPaymentMethods(property_id_)
 
 
 @app.route('/postPayment')
@@ -321,7 +315,7 @@ def verifone():
                                       stdout=subprocess.PIPE)  # , stdout=subprocess.PIPE, stderr=subprocess.PIPE
     # csharp_process.wait()
     time.sleep(1)
-    while (True):
+    while True:
 
         out = csharp_process.stdout.readline().decode()
         if "\n" in out:
@@ -463,6 +457,7 @@ def move_card_front_and_hold():
     else:
         return {'success': True, 'message': "Card on front"}
 
+
 # TESA
 @app.route("/tesa/findAllRooms")
 def tesa_find_all_rooms():
@@ -470,6 +465,7 @@ def tesa_find_all_rooms():
     try:
         service = GuestsWebService(host, operatorName, operatorPassword)
         response = service.find_all_rooms()
+        print(response)
         return {"success": True}
     except:
         return {"success": False}
@@ -480,23 +476,19 @@ def tesa_checkin():
     # Extrae los datos del JSON recibido
     data = request.get_json()
 
-    roomName = data['roomName']
-    roomId = roomsTable[roomName]
+    room_id = roomsTable.get(data.get('roomName'))
 
-    checkIn = data['checkIn']
-    checkInFormatted = format_date(checkIn)
-
-    checkOut = data['checkOut']
-    checkOutFormatted = format_date(checkOut, now=False)
+    check_in_formatted = format_date(data.get('checkIn'))
+    check_out_formatted = format_date(data.get('checkOut'), now=False)
 
     # Crea un cliente SOAP con la URL del servidor TESA
     service = GuestsWebService(host, operatorName, operatorPassword)
 
     # Realiza la operación de check-in utilizando el cliente SOAP
-    GuestInfoType = service.client.get_type('ns0:guestInfo')
-    guest_info = GuestInfoType(roomId=roomId, openowCheckin=True, localCardCheckin=True, agentId=agentId,
-                               dateActivation=checkInFormatted,
-                               dateExpiration=checkOutFormatted)
+    guest_info_type = service.client.get_type('ns0:guestInfo')
+    guest_info = guest_info_type(roomId=room_id, openowCheckin=True, localCardCheckin=True, agentId=agentId,
+                                 dateActivation=check_in_formatted,
+                                 dateExpiration=check_out_formatted)
     response = service.check_in(guest_info)
     result = check_response(response)
 
@@ -508,44 +500,37 @@ def checkin():
     # Extrae los datos del JSON recibido
     data = request.get_json()
 
-    roomName = data['roomName']
-    roomId = roomsTable[roomName]
+    room_id = roomsTable.get(data.get('roomName'))
 
-    checkIn = data['checkIn']
-    checkInFormatted = format_date(checkIn)
-
-    checkOut = data['checkOut']
-    checkOutFormatted = format_date(checkOut, now=False)
+    check_in_formatted = format_date(data.get('checkIn'))
+    check_out_formatted = format_date(data.get('checkOut'), now=False)
 
     # Mueve tarjeta a RF
-    response = rq.get("http://localhost:3200/api-hardware/v1/cardDispenser/moveCardToRF")
-
-    if not response:
-        result = {'success': False, 'type': "CARD_DISPENSER_ERROR", 'message': "error moving card to RF"}
-        return result
+    card_response = move_card_rfid()
+    if not card_response.get("success"):
+        return card_response
 
     # Crea un cliente SOAP con la URL del servidor TESA
     service = GuestsWebService(host, operatorName, operatorPassword)
 
     # Realiza la operación de check-in utilizando el cliente SOAP
-    GuestInfoType = service.client.get_type('ns0:guestInfo')
-    guest_info = GuestInfoType(roomId=roomId, openowCheckin=True, localCardCheckin=True, agentId=agentId,
-                               dateActivation=checkInFormatted,
-                               dateExpiration=checkOutFormatted)
+    guest_info_type = service.client.get_type('ns0:guestInfo')
+    guest_info = guest_info_type(roomId=room_id, openowCheckin=True, localCardCheckin=True, agentId=agentId,
+                                 dateActivation=check_in_formatted,
+                                 dateExpiration=check_out_formatted)
     response = service.check_in(guest_info)
     result = check_response(response)
 
     # Entrega tarjeta
-    response = rq.get("http://localhost:3200/api-hardware/v1/cardDispenser/moveCardToFrontAndHold")
-    if not response:
-        result = {'success': False, 'type': "CARD_DISPENSER_ERROR", 'message': "error moving card to front"}
-        return result
+    card_response = move_card_front_and_hold()
+    if not card_response.get("success"):
+        return card_response
 
     return jsonify(result)
 
 
 @app.route('/tesa/v1.0/checkInCopy')
-def checkinCopy():
+def check_in_copy():
     def post_processing_reservation(reservation_json: dict):
 
         reservation_out = {
@@ -586,6 +571,7 @@ def checkinCopy():
     # Get reservationID info
     reservation_id = request.args.get('reservationID', None)
     response_in_json = request_guest_and_reservation.get_reservation(reservation_id)
+    result = response_in_json
 
     if response_in_json["success"] == "true":
         response_data = response_in_json.get("data")
@@ -615,6 +601,7 @@ def checkinCopy():
             response = service.check_in_copy(guest_info)
             result = check_response(response)
 
+            # Entrega tarjeta
             card_response = move_card_front_and_hold()
             if not card_response.get("success"):
                 return card_response
@@ -626,7 +613,7 @@ def checkinCopy():
 
 
 @app.route('/tesa/v1.0/checkOut', methods=['POST'])
-def checkout():
+def check_out():
     # Extrae los datos del JSON recibido
     data = request.get_json()
 
