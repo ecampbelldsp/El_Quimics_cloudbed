@@ -393,7 +393,7 @@ def verifone():
 host = "192.168.1.10"
 operatorName = "direc"
 operatorPassword = "clave1"
-agentId = "c4097353db0354d419ca229064c98b" # Kiosko AgentID
+agentId = "c4097353db0354d419ca229064c98b"  # Kiosko AgentID
 
 # Hotel data
 roomsTable = {"101": "3", "102": "4", "103": "5", "104": "6", "105": "7", "106": "8",
@@ -446,9 +446,26 @@ def check_response(response):
     return result
 
 
+def move_card_rfid():
+    # Mueve tarjeta a RF
+    response = rq.get("http://localhost:3200/api-hardware/v1/cardDispenser/moveCardToRF")
+    if not response:
+        return {'success': False, 'type': "CARD_DISPENSER_ERROR", 'message': "error moving card to RF"}
+    else:
+        return {'success': True, 'message': "Card on RF"}
+
+
+def move_card_front_and_hold():
+    # Move card to front and hold it
+    response = rq.get("http://localhost:3200/api-hardware/v1/cardDispenser/moveCardToFrontAndHold")
+    if not response:
+        return {'success': False, 'type': "CARD_DISPENSER_ERROR", 'message': "error moving card to front"}
+    else:
+        return {'success': True, 'message': "Card on front"}
+
 # TESA
 @app.route("/tesa/findAllRooms")
-def find_all_rooms():
+def tesa_find_all_rooms():
     # Crea un cliente SOAP con la URL del servidor TESA
     try:
         service = GuestsWebService(host, operatorName, operatorPassword)
@@ -456,6 +473,34 @@ def find_all_rooms():
         return {"success": True}
     except:
         return {"success": False}
+
+
+@app.route("/tesa/checkIn", methods=["POST"])
+def tesa_checkin():
+    # Extrae los datos del JSON recibido
+    data = request.get_json()
+
+    roomName = data['roomName']
+    roomId = roomsTable[roomName]
+
+    checkIn = data['checkIn']
+    checkInFormatted = format_date(checkIn)
+
+    checkOut = data['checkOut']
+    checkOutFormatted = format_date(checkOut, now=False)
+
+    # Crea un cliente SOAP con la URL del servidor TESA
+    service = GuestsWebService(host, operatorName, operatorPassword)
+
+    # Realiza la operación de check-in utilizando el cliente SOAP
+    GuestInfoType = service.client.get_type('ns0:guestInfo')
+    guest_info = GuestInfoType(roomId=roomId, openowCheckin=True, localCardCheckin=True, agentId=agentId,
+                               dateActivation=checkInFormatted,
+                               dateExpiration=checkOutFormatted)
+    response = service.check_in(guest_info)
+    result = check_response(response)
+
+    return jsonify(result)
 
 
 @app.route("/tesa/v1.0/checkIn", methods=["POST"])
@@ -499,43 +544,83 @@ def checkin():
     return jsonify(result)
 
 
-@app.route('/tesa/v1.0/checkInCopy', methods=['POST'])
+@app.route('/tesa/v1.0/checkInCopy')
 def checkinCopy():
-    # Extrae los datos del JSON recibido
-    data = request.get_json()
+    def post_processing_reservation(reservation_json: dict):
 
-    roomName = data['roomName']
-    roomId = roomsTable[roomName]
+        reservation_out = {
+            "reservationID": reservation_json.get("reservationID"),
+            "roomName": "",
+            "startDate": reservation_json.get("startDate"),
+            "endDate": reservation_json.get("endDate"),
+            "paidStatus": ""
+        }
 
-    checkIn = data['checkIn']
-    checkInFormatted = format_date(checkIn)
+        for room in reservation_json['assigned']:
+            reservation_out['roomName'] = room.get('roomName')
 
-    checkOut = data['checkOut']
-    checkOutFormatted = format_date(checkOut, now=False)
+        # Pre-processing stage for Frontend
+        for key in reservation_out.keys():
+            data = reservation_out[key]
+            if isinstance(data, list):
+                data_set = set(data)
+                reservation_out[key] = " _ ".join(data_set)
 
-    # Mueve tarjeta a RF
-    response = rq.get("http://localhost:3200/api-hardware/v1/cardDispenser/moveCardToRF")
-    if not response:
-        result = {'success': False, 'type': "CARD_DISPENSER_ERROR", 'message': "error moving card to RF"}
-        return result
+        # Reformatting date tipe from YYYY-MM-DD to DD-MM-YYYY
+        for key in ['startDate', 'endDate']:
+            data = reservation_out[key]
+            data = data.split('_')
+            data = [d.split('-')[::-1] for d in data]
+            data = ['-'.join(d) for d in data]
+            data = ' _ '.join(data)
+            reservation_out[key] = data
 
-    # Crea un cliente SOAP con la URL del servidor TESA
-    service = GuestsWebService(host, operatorName, operatorPassword)
+        # Invoice reservation info
+        total = reservation_json['balanceDetailed']['grandTotal']
+        paid = reservation_json['balanceDetailed']['paid']
+        balance = float(total) - float(paid)
 
-    # Realiza la operación de check-in utilizando el cliente SOAP
-    GuestInfoType = service.client.get_type('ns0:guestInfo')
-    guest_info = GuestInfoType(roomId=roomId, openowCheckin=True, localCardCheckin=True, agentId=agentId,
-                               dateActivation=checkInFormatted,
-                               dateExpiration=checkOutFormatted)
+        reservation_out["paidStatus"] = "false" if balance > 0 else "true"
+        return reservation_out
 
-    response = service.check_in_copy(guest_info)
-    result = check_response(response)
+    # Get reservationID info
+    reservation_id = request.args.get('reservationID', None)
+    response_in_json = request_guest_and_reservation.get_reservation(reservation_id)
 
-    # Entrega tarjeta
-    response = rq.get("http://localhost:3200/api-hardware/v1/cardDispenser/moveCardToFrontAndHold")
-    if not response:
-        result = {'success': False, 'type': "CARD_DISPENSER_ERROR", 'message': "error moving card to front"}
-        return result
+    if response_in_json["success"] == "true":
+        response_data = response_in_json.get("data")
+        response_data = post_processing_reservation(response_data)
+
+        if response_data.get('paidStatus'):
+            room_name = response_data.get('roomName')
+            room_id = roomsTable.get(room_name)
+
+            check_in_formatted = format_date(response_data.get("startDate"))
+            check_out_formatted = format_date(response_data.get("endDate"), now=False)
+
+            # Mueve tarjeta a RF
+            card_response = move_card_rfid()
+            if not card_response.get("success"):
+                return card_response
+
+            # Crea un cliente SOAP con la URL del servidor TESA
+            service = GuestsWebService(host, operatorName, operatorPassword)
+
+            # Realiza la operación de check-in utilizando el cliente SOAP
+            guest_info_type = service.client.get_type('ns0:guestInfo')
+            guest_info = guest_info_type(roomId=room_id, openowCheckin=True, localCardCheckin=True, agentId=agentId,
+                                         dateActivation=check_in_formatted,
+                                         dateExpiration=check_out_formatted)
+
+            response = service.check_in_copy(guest_info)
+            result = check_response(response)
+
+            card_response = move_card_front_and_hold()
+            if not card_response.get("success"):
+                return card_response
+
+        else:
+            result = {"success": True, "message": "Please make the Check-In first, and then get a second key. Thanks!"}
 
     return jsonify(result)
 
