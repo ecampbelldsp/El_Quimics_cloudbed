@@ -4,10 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="763f90b1-d1a0-46f8-9139-74bb86b0482a" name="Changes" comment="adding payment confirmatioon">
+    <list default="true" id="763f90b1-d1a0-46f8-9139-74bb86b0482a" name="Changes" comment="Refactoring just for **quality code**">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/photo/picture.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/photo/picture.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/tokens_guests_and_reservation.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/tokens_guests_and_reservation.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/tokens_payments_and_room.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/tokens_payments_and_room.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hd/cam.py" beforeDir="false" afterPath="$PROJECT_DIR$/hd/cam.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,19 +51,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Opencheck/system/repos/El_Quimics_cloudbed/app.py",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Opencheck/system/repos/El_Quimics_cloudbed/app.py&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Flask server.Flask (app.py)">
     <configuration name="config" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="OpenCheck_restapi" />
@@ -93,7 +96,7 @@
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
@@ -157,7 +160,18 @@
       <workItem from="1670605144714" duration="958000" />
       <workItem from="1690192495526" duration="3779000" />
       <workItem from="1692007916720" duration="3145000" />
-      <workItem from="1692034323542" duration="3608000" />
+      <workItem from="1692034323542" duration="9484000" />
+      <workItem from="1692267970117" duration="9477000" />
+      <workItem from="1692882192958" duration="2307000" />
+      <workItem from="1692954855376" duration="728000" />
+      <workItem from="1693211850993" duration="5031000" />
+      <workItem from="1693477982375" duration="6042000" />
+      <workItem from="1693556492908" duration="240000" />
+      <workItem from="1693556764232" duration="440000" />
+      <workItem from="1693557798315" duration="6566000" />
+      <workItem from="1693565103597" duration="368000" />
+      <workItem from="1693565761757" duration="582000" />
+      <workItem from="1693569533094" duration="2252000" />
     </task>
     <task id="LOCAL-00001" summary="tokens">
       <created>1661779768256</created>
@@ -257,7 +271,63 @@
       <option name="project" value="LOCAL" />
       <updated>1692037303419</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="adding payment confirmatioon">
+      <created>1692038575006</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1692038575006</updated>
+    </task>
+    <task id="LOCAL-00016" summary="adding payment confirmatioon">
+      <created>1692224469216</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1692224469216</updated>
+    </task>
+    <task id="LOCAL-00017" summary="lower string case of payment notification success answer">
+      <created>1692268420899</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1692268420899</updated>
+    </task>
+    <task id="LOCAL-00018" summary="lower string case of payment notification success answer">
+      <created>1692287991292</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1692287991293</updated>
+    </task>
+    <task id="LOCAL-00019" summary="Change the Edward email for the guest and Els Quimics hotel.">
+      <created>1692892677894</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1692892677897</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Refactoring the repo with the TESA information">
+      <created>1693483991606</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1693483991606</updated>
+    </task>
+    <task id="LOCAL-00021" summary="Refactoring CheckInCopy to get a 2nd key using reservationID">
+      <created>1693563632057</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1693563632057</updated>
+    </task>
+    <task id="LOCAL-00022" summary="Refactoring just for **quality code**">
+      <created>1693564441578</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1693564441578</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -326,7 +396,12 @@
     <MESSAGE value="adding default info save path" />
     <MESSAGE value="agregando modulo verifone" />
     <MESSAGE value="adding payment confirmatioon" />
-    <option name="LAST_COMMIT_MESSAGE" value="adding payment confirmatioon" />
+    <MESSAGE value="lower string case of payment notification success answer" />
+    <MESSAGE value="Change the Edward email for the guest and Els Quimics hotel." />
+    <MESSAGE value="Refactoring the repo with the TESA information" />
+    <MESSAGE value="Refactoring CheckInCopy to get a 2nd key using reservationID" />
+    <MESSAGE value="Refactoring just for **quality code**" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactoring just for **quality code**" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -340,11 +415,6 @@
           <url>file://$PROJECT_DIR$/src/call.py</url>
           <line>263</line>
           <option name="timeStamp" value="11" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app.py</url>
-          <line>162</line>
-          <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/../../OpenCheck_restapi/src/config.py</url>
@@ -363,40 +433,41 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/call.py</url>
-          <line>704</line>
+          <line>706</line>
           <option name="timeStamp" value="21" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app.py</url>
-          <line>242</line>
-          <option name="timeStamp" value="22" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/call.py</url>
-          <line>665</line>
+          <line>666</line>
           <option name="timeStamp" value="23" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app.py</url>
-          <line>170</line>
-          <option name="timeStamp" value="24" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/call.py</url>
           <line>536</line>
-          <option name="timeStamp" value="28" />
+          <option name="timeStamp" value="25" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/call.py</url>
-          <line>548</line>
-          <option name="timeStamp" value="29" />
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>571</line>
+          <option name="timeStamp" value="55" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/email_server/send.py</url>
+          <line>59</line>
+          <option name="timeStamp" value="56" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/email_server/send.py</url>
+          <line>84</line>
+          <option name="timeStamp" value="57" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/OpenCheck_restapi$Flask__app_py_D__Projects_OpenCheck_restapi_app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1670420708471" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/El_Quimics_cloudbed$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1692037947364" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/El_Quimics_cloudbed$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1693566337874" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/El_Quimics_cloudbed$send.coverage" NAME="send Coverage Results" MODIFIED="1692284201701" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/email_server" />
     <SUITE FILE_PATH="coverage/OpenCheck_restapi$qr_generator.coverage" NAME="qr_generator Coverage Results" MODIFIED="1661858928061" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
     <SUITE FILE_PATH="coverage/OpenCheck_restapi$access_token_request.coverage" NAME="access_token_request Coverage Results" MODIFIED="1661633091185" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/OpenCheck_restapi$webcam_test.coverage" NAME="webcam_test Coverage Results" MODIFIED="1662015525409" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
