@@ -666,7 +666,7 @@ class requestVersion2:
             request_info_room = {}
             for i,room in enumerate(response_data['propertyRooms']):
                 #Avoiding duplicated rooms type. Picking the room with the highest price
-                if i != 0 and room['roomTypeName'] == name_rooms[-1]:
+                if len(name_rooms) != 0 and room['roomTypeName'] == name_rooms[-1]:
                     continue                #Adding filtering room by amount of adultds and children
                 if int(room["maxGuests"]) < adults + childrens:
                     continue
@@ -688,8 +688,10 @@ class requestVersion2:
                 request_info_room['childrenExtraCharge'] = room.get('childrenExtraCharge', 0)
                 name_rooms.append(room['roomTypeName'])
                 filter_rooms.append(request_info_room.copy())
-
-            return {'success': True, 'availableRooms': name_rooms, 'rooms': filter_rooms}
+            if len(name_rooms) != 0:
+                return {'success': True, 'availableRooms': name_rooms, 'rooms': filter_rooms}
+            else:
+                return {'success': False, 'availableRooms': name_rooms, 'rooms': filter_rooms}
 
         self.inner_tokens_check_and_update()
 
