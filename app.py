@@ -44,8 +44,9 @@ CORS(app)
 
 if not os.path.exists(DATA_CLIENT_PATH):
     os.mkdir(DATA_CLIENT_PATH)
-
-
+if not os.path.exists("C:/Opencheck/parte.txt"):
+    with open("C:/Opencheck/parte.txt","w") as file:
+        file.write("0")
 @app.route('/')
 def index():
     return {"success": True, "message": "WELCOME! Backend-Kiosko-Cloudbeds"}
@@ -759,6 +760,21 @@ def call_send_gmail_function(TO="", att=None):
             os.remove(f"{tmp}{file_name}")
 
     return send_message_status
+
+
+@app.route("/parteDeViajero", methods=["GET"])
+def parteDeViajero():
+    try:
+        # Test
+
+        with open("C:/Opencheck/parte.txt","r") as file:
+            parte = file.read()
+            newParte = str(int(parte)+1)
+        with open("C:/Opencheck/parte.txt","w") as file:
+            file.write(newParte)
+        return jsonify({'success': "true", 'data': parte})
+    except:
+        return  jsonify({'success': "false", 'data': "_"})
 
 
 @app.route("/qr")
