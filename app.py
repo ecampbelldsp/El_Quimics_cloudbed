@@ -45,8 +45,10 @@ CORS(app)
 if not os.path.exists(DATA_CLIENT_PATH):
     os.mkdir(DATA_CLIENT_PATH)
 if not os.path.exists("C:/Opencheck/parte.txt"):
-    with open("C:/Opencheck/parte.txt","w") as file:
+    with open("C:/Opencheck/parte.txt", "w") as file:
         file.write("0")
+
+
 @app.route('/')
 def index():
     return {"success": True, "message": "WELCOME! Backend-Kiosko-Cloudbeds"}
@@ -407,7 +409,7 @@ def format_date(date, now=True):
         now = datetime.now()
         date_object = date_object.replace(hour=now.hour, minute=now.minute, second=now.second)
     elif not now:
-        date_object = date_object.replace(hour=11, minute=00, second=00)
+        date_object = date_object.replace(hour=13, minute=00, second=00)
     return date_object.strftime("%Y-%m-%dT%H:%M:%S")
 
 
@@ -585,7 +587,7 @@ def check_in_copy():
             check_in_formatted = format_date(response_data.get("startDate"))
             check_out_formatted = format_date(response_data.get("endDate"), now=False)
 
-            # Mueve tarjeta a RF
+            # # Mueve tarjeta a RF
             card_response = move_card_rfid()
             if not card_response.get("success"):
                 return card_response
@@ -595,20 +597,24 @@ def check_in_copy():
 
             # Realiza la operación de check-in utilizando el cliente SOAP
             guest_info_type = service.client.get_type('ns0:guestInfo')
-            guest_info = guest_info_type(roomId=room_id, openowCheckin=True, localCardCheckin=True, agentId=agentId,
+            guest_info = guest_info_type(roomId=room_id, localCardCheckin=True, agentId=agentId,
                                          dateActivation=check_in_formatted,
                                          dateExpiration=check_out_formatted)
 
             response = service.check_in_copy(guest_info)
             result = check_response(response)
 
-            # Entrega tarjeta
-            card_response = move_card_front_and_hold()
-            if not card_response.get("success"):
-                return card_response
+            if result:
+                # Entrega tarjeta
+                card_response = move_card_front_and_hold()
+                if not card_response.get("success"):
+                    return card_response
+            else:
+                result = {"success": False,
+                          "message": "Check your reservation dates."}
 
         else:
-            result = {"success": True, "message": "Please make the Check-In first, and then get a second key. Thanks!"}
+            result = {"success": False, "message": "Please make the Check-In first, and then get a second key. Thanks!"}
 
     return jsonify(result)
 
@@ -767,14 +773,14 @@ def parteDeViajero():
     try:
         # Test
 
-        with open("C:/Opencheck/parte.txt","r") as file:
+        with open("C:/Opencheck/parte.txt", "r") as file:
             parte = file.read()
-            newParte = str(int(parte)+1)
-        with open("C:/Opencheck/parte.txt","w") as file:
+            newParte = str(int(parte) + 1)
+        with open("C:/Opencheck/parte.txt", "w") as file:
             file.write(newParte)
         return jsonify({'success': "true", 'data': parte})
     except:
-        return  jsonify({'success': "false", 'data': "_"})
+        return jsonify({'success': "false", 'data': "_"})
 
 
 @app.route("/qr")
@@ -792,4 +798,4 @@ def create_qr():
 
 if __name__ == '__main__':
     # Flask app
-    app.run(debug=True)
+    app.run(host="localhost", port=5050, debug=True)

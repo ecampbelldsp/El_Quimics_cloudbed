@@ -7,10 +7,10 @@
     <list default="true" id="763f90b1-d1a0-46f8-9139-74bb86b0482a" name="Changes" comment="updating repository before fixing bug of 4 adults reservation request">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/credentials/token.json" beforeDir="false" afterPath="$PROJECT_DIR$/credentials/token.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/tokens_guests_and_reservation.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/tokens_guests_and_reservation.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/tokens_payments_and_room.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/tokens_payments_and_room.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/email_server/oauth_init.py" beforeDir="false" afterPath="$PROJECT_DIR$/email_server/oauth_init.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/email_server/send.py" beforeDir="false" afterPath="$PROJECT_DIR$/email_server/send.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tesa.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tesa.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -223,7 +223,14 @@
       <workItem from="1693569533094" duration="2252000" />
       <workItem from="1693923163262" duration="1218000" />
       <workItem from="1693996127343" duration="495000" />
-      <workItem from="1693999082386" duration="3388000" />
+      <workItem from="1693999082386" duration="3984000" />
+      <workItem from="1694005457912" duration="81000" />
+      <workItem from="1694005744139" duration="186000" />
+      <workItem from="1694006818647" duration="620000" />
+      <workItem from="1694169854197" duration="977000" />
+      <workItem from="1694170940292" duration="231000" />
+      <workItem from="1694726649114" duration="843000" />
+      <workItem from="1695196140607" duration="15630000" />
     </task>
     <task id="LOCAL-00001" summary="tokens">
       <created>1661779768256</created>
@@ -428,7 +435,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="integration" />
+                        <option value="main" />
                       </list>
                     </value>
                   </entry>
@@ -498,15 +505,40 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>572</line>
-          <option name="timeStamp" value="55" />
+          <line>164</line>
+          <option name="timeStamp" value="56" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>468</line>
+          <option name="timeStamp" value="59" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>800</line>
+          <option name="timeStamp" value="61" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>604</line>
+          <option name="timeStamp" value="71" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>503</line>
+          <option name="timeStamp" value="81" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="Python.FlaskServer">
+        <watch expression="response_in_json.data.assigned.roomName" language="Python" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/OpenCheck_restapi$Flask__app_py_D__Projects_OpenCheck_restapi_app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1670420708471" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/El_Quimics_cloudbed$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1694002583667" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/El_Quimics_cloudbed$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1695323031296" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/El_Quimics_cloudbed$send.coverage" NAME="send Coverage Results" MODIFIED="1694002245867" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/email_server" />
     <SUITE FILE_PATH="coverage/OpenCheck_restapi$qr_generator.coverage" NAME="qr_generator Coverage Results" MODIFIED="1661858928061" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
     <SUITE FILE_PATH="coverage/El_Quimics_cloudbed$oauth_init.coverage" NAME="oauth_init Coverage Results" MODIFIED="1694000316056" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/email_server" />

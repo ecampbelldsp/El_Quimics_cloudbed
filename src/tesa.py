@@ -42,3 +42,17 @@ class GuestsWebService(BaseSOAPClient):
         response = self.client.service.findAllRooms(operatorName=self.operator_name,
                                                     operatorPassword=self.operator_password)
         return response
+
+
+class EncoderWebService(BaseSOAPClient):
+    def __init__(self, host, operator_name, operator_password):
+        self.descriptor = f"https://{host}:8181/TesaHotelPlatform/EncoderWebService?wsdl"
+        self.operator_name = operator_name
+        self.operator_password = operator_password
+        super().__init__(self.descriptor)
+
+    def delete(self, encoder_info):
+        response = self.client.service.delete(operatorName=self.operator_name,
+                                              operatorPassword=self.operator_password,
+                                              request=encoder_info)
+        return response
