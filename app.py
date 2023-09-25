@@ -418,18 +418,19 @@ def check_response(response):
     if response.type == 'RESULT_OK':
         result = {
             'success': True,
-            'message': 'Check-in realizado correctamente'
+            'message': 'Check-in/out success'
         }
     elif response.type == 'RESULT_ERROR' and response.errorCode == '508':
         result = {
             'success': True,
-            'errorCode': response.errorCode,
-            'message': 'Check-in/out realizado correctamente'
+            'message': 'Check-in/out successfully completed',
+            'errorCode': response.errorCode
         }
     # Verifica si el resultado es un error de habitación no ocupada (RESULT_ERROR_CHECKIN_ROOM_NOT_OCCUPIED)
     elif response.type == 'RESULT_ERROR' and response.errorType == 'RESULT_ERROR_CHECKIN_ROOM_NOT_OCCUPIED':
         result = {
             'success': False,
+            'message': 'Room not occupied.',
             'type': response.type,
             'errorCode': response.errorCode,
             'errorType': response.errorType
@@ -437,8 +438,8 @@ def check_response(response):
     else:
         result = {
             'success': False,
-            'type': response.errorType,
-            'message': response.errorDetail
+            'message': response.errorDetail,
+            'type': response.errorType
         }
     return result
 
@@ -455,6 +456,15 @@ def move_card_rfid():
 def move_card_front_and_hold():
     # Move card to front and hold it
     response = rq.get("http://localhost:3200/api-hardware/v1/cardDispenser/moveCardToFrontAndHold")
+    if not response:
+        return {'success': False, 'type': "CARD_DISPENSER_ERROR", 'message': "error moving card to front"}
+    else:
+        return {'success': True, 'message': "Card on front"}
+
+
+def move_car_error_card_bin():
+    # Move card to front and hold it
+    response = rq.get("http://localhost:3200/api-hardware/v1/cardDispenser/moveCardToErrorCardBin")
     if not response:
         return {'success': False, 'type': "CARD_DISPENSER_ERROR", 'message': "error moving card to front"}
     else:
@@ -524,10 +534,33 @@ def checkin():
     response = service.check_in(guest_info)
     result = check_response(response)
 
-    # Entrega tarjeta
-    card_response = move_card_front_and_hold()
-    if not card_response.get("success"):
-        return card_response
+    if result.get("success"):
+        # Entrega tarjeta
+        card_response = move_card_front_and_hold()
+        if not card_response.get("success"):
+            return card_response
+
+        # Espera y entrega segunda copia
+        time.sleep(15)
+
+        # Mueve tarjeta a RF
+        card_response = move_card_rfid()
+        if not card_response.get("success"):
+            return card_response
+
+        # Grabar duplicado
+        response = service.check_in_copy(guest_info)
+        result = check_response(response)
+        if not result.get("success"):
+            result = move_car_error_card_bin()
+
+        # Entrega tarjeta
+        card_response = move_card_front_and_hold()
+        if not card_response.get("success"):
+            return card_response
+    else:
+        # Mover a ErrorCardBin
+        result = move_car_error_card_bin()
 
     return jsonify(result)
 
