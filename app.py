@@ -435,6 +435,14 @@ def check_response(response):
             'errorCode': response.errorCode,
             'errorType': response.errorType
         }
+    elif response.type == 'RESULT_ERROR' and response.errorType == 'RESULT_ERROR_CHECKIN_ROOM_OCCUPIED':
+        result = {
+            'success': False,
+            'message': 'Check-in done! Please, make a key duplication instead. / Ya ha hecho el check-in! Por favor haga un duplicado de llaves',
+            'type': response.type,
+            'errorCode': response.errorCode,
+            'errorType': response.errorType
+        }
     else:
         result = {
             'success': False,
@@ -466,9 +474,9 @@ def move_car_error_card_bin():
     # Move card to front and hold it
     response = rq.get("http://localhost:3200/api-hardware/v1/cardDispenser/moveCardToErrorCardBin")
     if not response:
-        return {'success': False, 'type': "CARD_DISPENSER_ERROR", 'message': "error moving card to front"}
+        return {'success': False, 'type': "CARD_DISPENSER_ERROR", 'message': "Error moving card to error card bin"}
     else:
-        return {'success': True, 'message': "Card on front"}
+        return {'success': True, 'message': "Card on error card bin"}
 
 
 # TESA
@@ -560,7 +568,7 @@ def checkin():
             return card_response
     else:
         # Mover a ErrorCardBin
-        result = move_car_error_card_bin()
+        move_car_error_card_bin()
 
     return jsonify(result)
 
@@ -758,17 +766,13 @@ class VideoThread(threading.Thread):
 
 
 @app.route('/sendEmail')
-def call_send_gmail_function(TO="", att=None):
+def call_send_gmail_function():
     reservationID = request.args.get('reservationID', None)
+    guest_email = request.args.get('TO', None)
+
     if reservationID is None or len(reservationID) == 0:
         return json.dumps({"data": "", "success": False})
 
-    response_in_json = request_guest_and_reservation.get_reservation(reservationID)
-    if response_in_json["success"] == "true":
-        reservation_json = response_in_json['data']
-        guest_email = reservation_json.get("guestEmail")
-    else:
-        return json.dumps({"data": "", "success": False})
 
     with zipfile.ZipFile(f"{DATA_CLIENT_PATH}{reservationID}.zip", "w") as zf:
         tmp = f"{DATA_CLIENT_PATH}"

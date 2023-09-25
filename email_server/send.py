@@ -109,4 +109,4 @@ def gmail_send_message(FROM = None, TO = None, attachment_filename = None, messa
 if __name__ == '__main__':
     os.chdir("../")
     # gmail_send_message(FROM = 'opencheckdoc@gmail.com' , TO ="ecampbelldsp@gmail.com", att = '')
-    gmail_send_message(FROM = 'apartamentoselsquimics@gmail.com' , TO ="ecampbelldsp@gmail.com", attachment_filename = "C:/Opencheck/tmp/9032979507951.zip", message_text = "Automatic draft message", subject="TEST")
+    gmail_send_message(FROM = 'apartamentoselsquimics@gmail.com' , TO ="ecampbelldsp@gmail.com", attachment_filename = "C:/Opencheck/tmp/2706982272212_huesped_1.pdf", message_text = "Automatic draft message", subject="TEST")
