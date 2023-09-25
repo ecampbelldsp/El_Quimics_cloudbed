@@ -2,19 +2,24 @@
 .idea/
 workspace.xml
 
+# VScide
+.vs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
 # C extensions
-
 *.so
 
 #image files
 *.png
 *.jpg
 *.svg
+
+# Credentials
+token*
 
 # Distribution / packaging
 .Python
