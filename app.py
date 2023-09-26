@@ -804,6 +804,12 @@ def call_send_gmail_function():
 
     return send_message_status
 
+@app.route("/deleteCache", methods=["GET"])
+def deleteCache():
+    tmp = f"{DATA_CLIENT_PATH}"
+    for file_name in os.listdir(tmp):
+        os.remove(f"{tmp}{file_name}")
+    return jsonify(result = {'success': True, 'message': "cache deleted"})
 
 @app.route("/parteDeViajero", methods=["GET"])
 def parteDeViajero():
