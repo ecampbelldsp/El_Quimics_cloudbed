@@ -4,12 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="763f90b1-d1a0-46f8-9139-74bb86b0482a" name="Changes" comment="Adding tokens and vs files to gitignore">
+    <list default="true" id="763f90b1-d1a0-46f8-9139-74bb86b0482a" name="Changes" comment="delete cache from index.html">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/credentials/token.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/data/tokens_guests_and_reservation.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/tokens_guests_and_reservation.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/tokens_payments_and_room.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/tokens_payments_and_room.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/email_server/credentials/token.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/email_server/credentials_borrar/credentials.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/email_server/credentials_borrar/opencheckdev_client_secret_168782590674-7v1jfpf3mab8lrqkgk7j1hiib8soeedd.apps.googleusercontent.com.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/email_server/credentials_borrar/token.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/email_server/send.py" beforeDir="false" afterPath="$PROJECT_DIR$/email_server/send.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -234,7 +236,9 @@
       <workItem from="1695373248435" duration="3732000" />
       <workItem from="1695632447303" duration="172000" />
       <workItem from="1695657770275" duration="2597000" />
-      <workItem from="1695662199796" duration="2103000" />
+      <workItem from="1695662199796" duration="2698000" />
+      <workItem from="1695721340777" duration="373000" />
+      <workItem from="1695721762245" duration="1745000" />
     </task>
     <task id="LOCAL-00001" summary="tokens">
       <created>1661779768256</created>
@@ -411,7 +415,14 @@
       <option name="project" value="LOCAL" />
       <updated>1695632609412</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="delete cache from index.html">
+      <created>1695722423903</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1695722423903</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -488,7 +499,8 @@
     <MESSAGE value="updating repository before fixing bug of 4 adults reservation request" />
     <MESSAGE value="duplicado" />
     <MESSAGE value="Adding tokens and vs files to gitignore" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding tokens and vs files to gitignore" />
+    <MESSAGE value="delete cache from index.html" />
+    <option name="LAST_COMMIT_MESSAGE" value="delete cache from index.html" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -530,8 +542,23 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>837</line>
+          <line>843</line>
           <option name="timeStamp" value="61" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/email_server/send.py</url>
+          <line>51</line>
+          <option name="timeStamp" value="62" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/email_server/send.py</url>
+          <line>41</line>
+          <option name="timeStamp" value="63" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>769</line>
+          <option name="timeStamp" value="64" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -543,7 +570,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/OpenCheck_restapi$Flask__app_py_D__Projects_OpenCheck_restapi_app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1670420708471" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/El_Quimics_cloudbed$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1695664000651" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/El_Quimics_cloudbed$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1695723184276" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/El_Quimics_cloudbed$send.coverage" NAME="send Coverage Results" MODIFIED="1695659093311" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/email_server" />
     <SUITE FILE_PATH="coverage/OpenCheck_restapi$qr_generator.coverage" NAME="qr_generator Coverage Results" MODIFIED="1661858928061" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
     <SUITE FILE_PATH="coverage/El_Quimics_cloudbed$oauth_init.coverage" NAME="oauth_init Coverage Results" MODIFIED="1695658275951" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/email_server" />

@@ -36,6 +36,8 @@ from email.mime.text import MIMEText
 import google.auth
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+
+# os.chdir("../")
 def oauth_init():
     SCOPES = ['https://mail.google.com/']
 
@@ -107,6 +109,5 @@ def gmail_send_message(FROM = None, TO = None, attachment_filename = None, messa
 
 
 if __name__ == '__main__':
-    os.chdir("../")
     # gmail_send_message(FROM = 'opencheckdoc@gmail.com' , TO ="ecampbelldsp@gmail.com", att = '')
     gmail_send_message(FROM = 'apartamentoselsquimics@gmail.com' , TO ="ecampbelldsp@gmail.com", attachment_filename = "C:/Opencheck/tmp/2706982272212_huesped_1.pdf", message_text = "Automatic draft message", subject="TEST")
