@@ -126,8 +126,8 @@ def get_reservation():
             reservation_out['roomID'].append(room.get('roomTypeID'))
             reservation_out['roomName'].append(room.get('roomName'))
             reservation_out['roomTypeName'].append(room.get('roomTypeName'))
-            reservation_out['startDate'].append(room.get('dailyRates')[0]['date'])  # room.get('startDate')
-            reservation_out['endDate'].append(room.get('dailyRates')[-1]['date'])
+            reservation_out['startDate'].append(room.get('startDate'))
+            reservation_out['endDate'].append(room.get("endDate"))
             reservation_out['adults'].append(room.get('adults'))
             reservation_out['children'].append(room.get('children'))
 
@@ -135,8 +135,8 @@ def get_reservation():
             reservation_out['roomID'].append(room.get('roomTypeID'))
             reservation_out['roomName'].append(room.get('roomName'))
             reservation_out['roomTypeName'].append(room.get('roomTypeName'))
-            reservation_out['startDate'].append(room.get('dailyRates')[0]['date'])
-            reservation_out['endDate'].append(room.get('dailyRates')[-1]['date'])
+            reservation_out['startDate'].append(room.get('startDate'))
+            reservation_out['endDate'].append(room.get("endDate"))
             reservation_out['adults'].append(room.get('adults'))
             reservation_out['children'].append(room.get('children'))
 
@@ -144,7 +144,7 @@ def get_reservation():
         for key in reservation_out.keys():
             data = reservation_out[key]
             if isinstance(data, list):
-                # data = ['' for d in data if d is None]
+                data = ['' if d is None else d for d in data]
                 data_set = set(data)
                 reservation_out[key] = " _ ".join(data_set)
 
