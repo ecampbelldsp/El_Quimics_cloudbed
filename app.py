@@ -660,6 +660,94 @@ def check_in_copy():
     return jsonify(result)
 
 
+def bot_check_in(command: str, room_id, check_in_formatted, check_out_formatted):
+
+    if command == "checkIn":
+        # Mueve tarjeta a RF
+        card_response = move_card_rfid()
+        if not card_response.get("success"):
+            return {"success": False, "message": "ERROR ON BOT-CHECKIN"}
+
+        # Crea un cliente SOAP con la URL del servidor TESA
+        service = GuestsWebService(host, operatorName, operatorPassword)
+
+        # Make checkOut
+        service.check_out(room_id)
+
+        # Realiza la operación de check-in utilizando el cliente SOAP
+        guest_info_type = service.client.get_type('ns0:guestInfo')
+        guest_info = guest_info_type(roomId=room_id, localCardCheckin=True, agentId=agentId,
+                                     dateActivation=check_in_formatted,
+                                     dateExpiration=check_out_formatted)
+
+        response = service.check_in(guest_info)
+        result = check_response(response)
+
+        if result.get("success", False):
+            # Entrega tarjeta
+            card_response = move_card_front_and_hold()
+            return {"success": True, "message": "Check-In done!!", "status_code": 200}
+    elif command == "checkInCopy":
+        # Mueve tarjeta a RF
+        card_response = move_card_rfid()
+        if not card_response.get("success"):
+            return {"success": False, "message": "ERROR ON BOT-CHECKIN"}
+
+        # Crea un cliente SOAP con la URL del servidor TESA
+        service = GuestsWebService(host, operatorName, operatorPassword)
+
+        # Realiza la operación de check-in utilizando el cliente SOAP
+        guest_info_type = service.client.get_type('ns0:guestInfo')
+        guest_info = guest_info_type(roomId=room_id, localCardCheckin=True, agentId=agentId,
+                                     dateActivation=check_in_formatted,
+                                     dateExpiration=check_out_formatted)
+
+        response = service.check_in_copy(guest_info)
+        result = check_response(response)
+
+        if result.get("success", False):
+            # Entrega tarjeta
+            card_response = move_card_front_and_hold()
+            return {"success": True, "message": "Check-InCopy done!!", "status_code": 200}
+
+    else:
+        return jsonify({"success": False, "message": "Command send not valid."})
+
+    return jsonify({"success": False, "message": "ERROR ON BOT-CHECKIN"})
+
+
+@app.route('/bot/checkIn')
+def bot():
+    # Get reservationID info
+    room_number = request.args.get("roomNumber", None)
+    room = roomsTable.get(room_number)
+
+    check_in_date = format_date(request.args.get("startDate"))
+    check_out_date = format_date(request.args.get("endDate"), now=False)
+
+    command_req = request.args.get("command", None)
+
+    if room is None:
+        response_ = {"success": False,
+                  "message": "ROOM not valid"}
+        return jsonify(response_)
+    elif dateparser.parse(check_in_date) >= dateparser.parse(check_out_date):
+        response_ = {"success": False, "message": "Invalid checkin or checkout dates", "status_code": 500}
+        return jsonify(response_)
+
+    # Start the request
+    for intent in range(6):
+        response_ = bot_check_in(command=command_req, room_id= room, check_in_formatted=check_in_date,
+                                 check_out_formatted=check_out_date)
+
+        if response_.get("success", False):
+            break
+        elif intent == 3:
+            move_car_error_card_bin()
+
+    return response_
+
+
 @app.route('/tesa/v1.0/checkOut', methods=['POST'])
 def check_out():
     # Extrae los datos del JSON recibido
@@ -773,7 +861,6 @@ def call_send_gmail_function():
     if reservationID is None or len(reservationID) == 0:
         return json.dumps({"data": "", "success": False})
 
-
     with zipfile.ZipFile(f"{DATA_CLIENT_PATH}{reservationID}.zip", "w") as zf:
         tmp = f"{DATA_CLIENT_PATH}"
         for file_name in os.listdir(tmp):
@@ -804,12 +891,14 @@ def call_send_gmail_function():
 
     return send_message_status
 
+
 @app.route("/deleteCache", methods=["GET"])
 def deleteCache():
     tmp = f"{DATA_CLIENT_PATH}"
     for file_name in os.listdir(tmp):
         os.remove(f"{tmp}{file_name}")
-    return jsonify(result = {'success': True, 'message': "cache deleted"})
+    return jsonify(result={'success': True, 'message': "cache deleted"})
+
 
 @app.route("/parteDeViajero", methods=["GET"])
 def parteDeViajero():
